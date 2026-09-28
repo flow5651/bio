@@ -228,23 +228,24 @@ def build_questions():
 
             q = dict(id=qno, type=qtype, correct=correct)
             if qtype == "single" and not need_image:
-                # assign opt text
-                otext = []
-                for r in opts:
-                    # join following non-opt lines until next opt
-                    pass
-                # simpler: use just the opt line text
+                # rebuild options: accumulate continuation lines into current option
+                cur_opt = None
+                parts = {}
+                stem_parts = []
+                for r in region:
+                    if r["opt"] is not None:
+                        cur_opt = int(r["opt"])
+                        parts[cur_opt] = re.sub(OPT_RE, '', r["text"]).strip()
+                    elif cur_opt is None:
+                        stem_parts.append(r["text"])
+                    else:
+                        parts[cur_opt] += ' ' + r["text"].strip()
                 opts_dict = {}
-                for r in opts:
-                    opts_dict[int(r["opt"])] = re.sub(OPT_RE, '', r["text"]).strip()
+                for num in sorted(parts):
+                    opts_dict[str(num)] = re.sub(r'\s+', ' ', parts[num]).strip()
                 q["opts"] = opts_dict
                 q["nopts"] = nopts
-                # stem = region text minus opt lines
-                stem = []
-                for r in region:
-                    if r["opt"] is None:
-                        stem.append(r["text"])
-                q["stem"] = " ".join(stem)
+                q["stem"] = re.sub(r'\s+', ' ', " ".join(stem_parts)).strip()
             else:
                 q["nopts"] = nopts
                 q["imgs"] = imgs
