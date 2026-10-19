@@ -173,6 +173,7 @@ select:hover,button:hover{border-color:var(--accent);}
 
         <div class="actions" style="margin-top:6px;">
           <button class="hintbtn btn-ghost" id="revealBtn">👁 Показать ответ</button>
+          <button class="hintbtn btn-ghost" id="resetAnswerBtn">↺ Сбросить ответ</button>
         </div>
         <div class="result" id="resultBox"></div>
 
@@ -466,6 +467,11 @@ function checkAnswer(){
   const ok=isCorrect(q);
   checked[k]=true; results[k]=ok; saveProgress(); buildGrid(); render();
 }
+$('resetAnswerBtn').onclick=()=>{
+  const qi=activeList[pos]; const q=currentQuestions()[qi]; const k=byKey(q);
+  delete selected[k]; delete checked[k]; delete results[k]; delete filled[k];
+  saveProgress(); buildGrid(); render();
+};
 revealBtn.onclick=()=>{
   const qi=activeList[pos]; const q=currentQuestions()[qi]; const k=byKey(q);
   if(q.type==='fill'){
